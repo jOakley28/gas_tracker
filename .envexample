@@ -1,0 +1,2 @@
+SECRET_KEY="secret"
+IP="1.0.0.0"
