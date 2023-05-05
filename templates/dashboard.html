@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+	<title>Gas Mileage Tracker</title>
+  <style>
+    body {
+        background-color: #121212;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 20px;
+    }
+    header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        }
+
+    header h1 {
+        color: #fff;
+        text-align: center;
+        padding-left: 100px;
+        margin: 0 auto;
+        }
+    a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #444;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    a:hover {
+        background-color: #5f1515;
+    }
+    form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    label {
+        display: block;
+        margin-bottom: 10px;
+    }
+    input, select {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        margin-bottom: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        }
+
+    input[type=submit] {
+        background-color: #1E88E5;
+        color: #fff;
+        cursor: pointer;
+    }
+      
+</style>
+<body>
+  <header>
+      <h1>Dashboard</h1>
+      <a href="/">Go Home</a>
+  </header>     
+  <form action="{{ url_for('add_gas') }}" method="POST">
+    <select id="cars-dropdown">
+      <option value="" selected disabled">Select a car</option>
+      {% for car in cars %}
+      <option value="{{ car['car_id'] }}">{{ car['owner'] }}'s {{ car['year'] }} {{ car['model'] }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="row justify-content-center"> 
+            <div class="card-body">
+            <div class="fields" style="justify-content: center; margin-bottom: 20px;">
+              <label>Last 20 jobs</label>
+              {{ gas_table|safe }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>

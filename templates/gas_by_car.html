@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gas Tracker</title>
+  </head>
+  <body>
+    <h1>Gas Tracker</h1>
+    <label for="cars-dropdown">Select Car:</label>
+    <select id="cars-dropdown">
+      <option value="" selected disabled>Select a car</option>
+      {% for car in cars %}
+      <option value="{{ car['car_id'] }}">{{ car['owner'] }}'s {{ car['year'] }} ({{ car['model'] }})</option>
+      {% endfor %}
+    </select>
+    <br>
+    <br>
+    <table id="gas-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Cost</th>
+          <th>Amount</th>
+          <th>Distance</th>
+          <th>Phase</th>
+        </tr>
+      </thead>
+      <tbody id="gas-table-body">
+      </tbody>
+    </table>
+
+    <script>
+      const carsDropdown = document.querySelector('#cars-dropdown');
+      const gasTableBody = document.querySelector('#gas-table-body');
+
+      carsDropdown.addEventListener('change', () => {
+        const carId = carsDropdown.value;
+        if (carId) {
+          fetch(`/gas/${carId}`)
+            .then(response => response.json())
+            .then(data => {
+              gasTableBody.innerHTML = '';
+              data.forEach(gas => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td>${gas.date}</td>
+                  <td>${gas.cost}</td>
+                  <td>${gas.amount}</td>
+                  <td>${gas.distance}</td>
+                  <td>${gas.phase}</td>
+                `;
+                gasTableBody.appendChild(row);
+              });
+            })
+            .catch(error => console.error(error));
+        } else {
+          gasTableBody.innerHTML = '';
+        }
+      });
+    </script>
+  </body>
+</html>
