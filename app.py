@@ -137,6 +137,6 @@ if __name__ == '__main__':
     server.run(
         debug=True,
         host=os.getenv('IP'),
-        port=3000
+        port=8080
     )
 
