@@ -65,9 +65,9 @@
         <h1>Add Gas</h1>
         <a href="/">Go Home</a>
     </header>     
+    <br>
     <form action="{{ url_for('add_gas') }}" method="POST">
-        <label for="car_id">Car:</label>
-        <select id="car_id" name="car_id">
+        <select id="car_id" name="car_id" onchange="car_selected()">
             <option value="" selected disabled>Select a car</option>
             {% for car in cars %}
                   <option value="{{ car.car_id }}">{{ car.owner }}'s {{ car.year }} {{ car.model }}</option>
@@ -79,27 +79,16 @@
         <input type="text" pattern="[0-9]*[.,]?[0-9]+" placeholder="xx.xx" id="cost" name="cost" required>
         <br><br>
         <label for="amount">Amount (gallons):</label>
-        <input type="text" pattern="[0-9]*[.,]?[0-9]+" placeholder="xx.x" id="cost" name="amount" required>
+        <input type="text" pattern="[0-9]*[.,]?[0-9]+" placeholder="xx.x" id="amount" name="amount" required>
         <br><br>
         <label for="distance">Distance (miles):</label>
-        <input type="text" pattern="[0-9]*[.,]?[0-9]+" placeholder="xxx.x" id="cost" name="distance" required>
+        <input type="text" pattern="[0-9]*[.,]?[0-9]+" placeholder="xxx.x" id="distance" name="distance" required>
         <br><br>
         
-        <label for="phase">Phase:</label>
-        <select id="phase" name="phase">
-            <option value="" disabled selected>Phase</option>
-            {% for phase in phases %}
-                  <option value="{{ phase }}">{{ phase }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="phase">Life Phase:</label>
-        <input type="text" placeholder="e.g. GFU '22-23 living off campus  --  blank records previously listed life phase" id="cost" name="phase" required>
+        <label for="phase">Life phase:</label>
+        <input type="text" placeholder="" id="phase" name="phase">
         <br><br>
         <input type="submit" value="Add Gas">
     </form>
-</body>
 
-<script src="/resources/add_gas.js"></script>
-
-</html>
+    <script src="/resources/add_gas.js"></script>
