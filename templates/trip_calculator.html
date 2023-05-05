@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>Gas Mileage Tracker</title>
-	
+    <meta charset="UTF-8">
+    <title>Trip Calculator</title>
     <style>
         body {
             background-color: #121212;
@@ -22,12 +21,9 @@
         header h1 {
             color: #fff;
             text-align: center;
+            padding-left: 100px;
             margin: 0 auto;
             }
-        .container {
-            text-align: center;
-            }
-
         a {
             display: inline-block;
             padding: 10px 20px;
@@ -36,32 +32,13 @@
             text-decoration: none;
             border-radius: 5px;
             margin-bottom: 20px;
-            width: 200px;
-            margin-left: 20px;
-            }
+        }
         a:hover {
             background-color: #5f1515;
         }
-        a.button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #444;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            }
-
-        a.button:hover {
-            background-color: #666;
-            }
-
-        a.button:active {
-            background-color: #333;
-            }
-
-        form {
-            max-width: 500px;
+        select, input {
+            max-width: 300px;
+            min-width: 200px%;
             margin: 0 auto;
         }
         label {
@@ -83,17 +60,31 @@
             cursor: pointer;
         }
     </style>
-
 </head>
 <body>
-    <div class="container">
-      <h1>Gas Mileage Tracker</h1>
-      <br>
-      <a href="/add_gas">Add Gas</a>
-      <a href="/trip_calculator">Trip Calculator</a>
-      <br><br>
-      <a href="/add_car">Add a Car</a>
-      <a href="/dashboard">View Dashboard</a>
-    </div>
+    <header>
+      <h1>Trip Calculator</h1>
+      <a href="/">Go Home</a>
+    </header>
+
+    <div style="text-align: center;">
+        <select id="car_id" name="car_id">
+            {% set first_car = cars[0] %}
+            <option value="{{ first_car.car_id }}" selected>{{ first_car.owner }}'s {{ first_car.year }} {{ first_car.model }}</option>
+            {% for car in cars[1:] %}
+            <option value="{{ car.car_id }}">{{ car.owner }}'s {{ car.year }} {{ car.model }}</option>
+            {% endfor %}
+          </select>
+          
+        <br>
+        <input id="trip_length" name="trip_length" type="number" placeholder="Trip length (distance in miles)" style="text-align: center;" required>
+        <br>
+        <input type="submit" id="calculate_button">
+        <br><br>
+        <div id="results"></div>
+      </div>
+      
   </body>
-  </html>
+</html>
+
+<script src="/resources/trip_cost.js"></script>

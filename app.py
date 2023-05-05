@@ -1,5 +1,6 @@
 import os
 import json
+import jsonify
 import dotenv
 import base64
 import plotly
@@ -40,6 +41,10 @@ def page_not_found(e):
         referer = url_for("home")
     return render_template('404.html', referer=referer), 404
 
+@server.route('/resources/<path:path>')
+def send_resources(path):
+    return send_file(f"resources/{path}")
+
 @server.route('/')
 def home():
     return render_template('index.html')
@@ -74,7 +79,7 @@ def add_gas():
         
         if gas.add_gas(car_id, cost, amount, distance, phase):
             flash('Gas record added successfully!', 'success')
-            return redirect('/')
+            return redirect('fill_up_summary')
         else:
             flash('Error adding gas record.', 'error')
     
@@ -83,6 +88,24 @@ def add_gas():
 @server.route('/api/phase/<car_id>')
 def get_phase(car_id):
     return jsonify(gas.get_phases_by_car(car_id))
+
+@server.route('/fill_up_summary')
+def fill_up_summary():
+    cars = gas.get_all_cars()
+    last_gas = gas.get_last_gas()
+    cost_per_gallon = last_gas['cost_per_gallon'].tolist()[0]
+    mpg = last_gas['trip_mpg'].tolist()[0]
+    cost_per_mile = round(cost_per_gallon/mpg, 2)
+    distance_remaining = last_gas['distance_remaining'].tolist()[0]
+    phase = last_gas['phase'].tolist()[0]
+
+    return render_template('fill_up_summary.html', 
+                           cost_per_gallon=cost_per_gallon, 
+                           mpg=mpg,
+                           cost_per_mile=cost_per_mile,
+                           distance_remaining=distance_remaining,
+                           phase=phase, 
+                           cars=cars,)
 
 @server.route('/dashboard')
 def dashboard():
@@ -94,9 +117,17 @@ def dashboard():
 
     return render_template('dashboard.html', gas_table=gas_table, cars=cars)
 
+@server.route('/trip_calculator', methods=['GET', 'POST'])
+def trip_calculator():
+    cars = gas.get_all_cars()
+    return render_template('trip_calculator.html', cars=cars)
 
-if __name__ == '__main__':
-    gas = Gas("database.db")  # create an instance of Gas
+@server.route('/api/trip_cost/<int:trip_length>/<int:car_id>')
+def trip_cost(trip_length, car_id):
+    return jsonify(gas.trip_cost(car_id, trip_length))
+
+# main loop
+if __name__ == '__main__':  
     if gas.db_size() == 0:
         print("Creating database tables...")
         with open("schema.sql") as f:

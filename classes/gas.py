@@ -76,6 +76,11 @@ class Gas:
         gas_df = pd.read_sql_query("SELECT * FROM gas WHERE car_id = ?", self.db, params=(car_id,))
         return gas_df
     
+    def get_last_gas(self):
+        gas_df = pd.read_sql_query("SELECT * FROM gas", self.db)
+        last_gas_df = (gas_df.tail(n=1))
+        return last_gas_df
+
     def get_car(self, car_id) -> pd.DataFrame:
         cars_df = pd.read_sql_query(
             "SELECT * FROM cars WHERE car_id = ?", self.db, params=(car_id,)
@@ -86,10 +91,10 @@ class Gas:
         cars_df = pd.read_sql_query("SELECT * FROM cars", self.db)
         return cars_df.to_dict(orient="records")
     
-    def get_phases_by_car(self):
+    def get_phases_by_car(self, car_id):
         prev_gas = self.get_gas_by_car(car_id)
-        phases = prev_gas['phase'].unique()        
-        return phases
+        phases = prev_gas['phase']        
+        return phases.tolist()
     
     """
     edit in database
@@ -117,6 +122,35 @@ class Gas:
         except Exception as e:
             print(f"Failed to edit gas: {e}")
             return False
+
+    """
+    calculate based on database
+    """
+    def trip_cost(self, car_id, trip_length):
+        # calculated based off of 5 most recent trips, 
+        gas = self.get_gas_by_car(car_id)
+        last_five_gas = gas.tail(n=5)
+
+        # more conservative estamate mpg (will take the higher of the 5 trip average or the most recent mpg)
+        average_mpg = float(last_five_gas['trip_mpg'].mean())
+        most_recent_mpg = float(last_five_gas['trip_mpg'].tail(n=1).to_list()[0])
+        if average_mpg >= most_recent_mpg:
+            approx_mpg = average_mpg
+        else:
+            approx_mpg = most_recent_mpg
+
+        # conservative $/gal
+        average_cost_per_gallon = float(last_five_gas['cost_per_gallon'].mean())
+        most_recent_cost_per_gallon = float(last_five_gas['cost_per_gallon'].tail(n=1).to_list()[0])
+        if average_cost_per_gallon >= most_recent_cost_per_gallon:
+            approx_cost_per_gallon = average_cost_per_gallon
+        else:
+            approx_cost_per_gallon = most_recent_cost_per_gallon
+
+        # cost = cost/gal * (miles/gal)^-1 * miles
+        trip_cost = approx_cost_per_gallon / approx_mpg * float(trip_length)
+
+        return round(trip_cost, 2)
 
     """
     dashboard plots
